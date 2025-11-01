@@ -1,15 +1,17 @@
-name: 📦 CORE Auto Release
+name: 🚀 CORE Auto Release
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["🧪 CORE Build & Test"]
+    types:
+      - completed
 
 permissions:
   contents: write
 
 jobs:
   release:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
