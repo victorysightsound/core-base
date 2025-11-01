@@ -1,7 +1,52 @@
+# =========================
+# OS & Editor Files
+# =========================
 .DS_Store
+Thumbs.db
+Icon?
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# Editor folders
 .vscode/
+.idea/
+
+# =========================
+# Windsurf IDE
+# =========================
 .windsurf/*
 !.windsurf/*.md
 !.windsurf/rules/*.md
-target/
-node_modules/
+
+# =========================
+# Rust / Backend (core)
+# =========================
+core/target/
+core/Cargo.lock
+core/core.db
+
+# =========================
+# Node / Frontend (webui)
+# =========================
+webui/node_modules/
+webui/dist/
+webui/.solid/
+
+# =========================
+# Environment & Config
+# =========================
+.env
+.env.*
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# =========================
+# Misc Temporary
+# =========================
+*.old
+*.backup
+
