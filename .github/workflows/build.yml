@@ -1,0 +1,52 @@
+name: 🧪 CORE Build & Test
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🧱 Checkout repository
+        uses: actions/checkout@v4
+
+      # ------------------------------
+      # Rust Backend (core)
+      # ------------------------------
+      - name: ⚙️ Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: 🧰 Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y pkg-config libssl-dev
+
+      - name: 🦀 Build Rust backend
+        working-directory: core
+        run: cargo build --verbose
+
+      - name: 🧪 Test Rust backend
+        working-directory: core
+        run: cargo test --verbose
+
+      # ------------------------------
+      # Node Frontend (webui)
+      # ------------------------------
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 📦 Install Node dependencies
+        working-directory: webui
+        run: npm ci || npm install
+
+      - name: 🧱 Build SolidJS frontend
+        working-directory: webui
+        run: npm run build
