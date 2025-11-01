@@ -1,0 +1,9 @@
+{
+  "name": "core-webui",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "echo Start SolidJS dev server later",
+    "build": "echo Build SolidJS app later"
+  }
+}
