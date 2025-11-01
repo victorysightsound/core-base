@@ -1,0 +1,32 @@
+{
+  "name": "core-base",
+  "version": "1.0.1",
+  "description": "The foundation of the CORE platform (Rust API + SolidJS frontend).",
+  "private": true,
+  "scripts": {
+    "release": "standard-version && git push && git push --tags && gh release create $(git describe --tags --abbrev=0) -F CHANGELOG.md --generate-notes"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/victorysightsound/core-base.git"
+  },
+  "bugs": {
+    "url": "https://github.com/victorysightsound/core-base/issues"
+  },
+  "homepage": "https://github.com/victorysightsound/core-base#readme",
+  "author": "Victory Sight Sound",
+  "license": "ISC",
+  "keywords": [
+    "CORE",
+    "SolidJS",
+    "Rust",
+    "Fullstack",
+    "Cloudflare",
+    "Modular"
+  ],
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
