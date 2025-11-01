@@ -1,5 +1,7 @@
 .DS_Store
 .vscode/
-.windsurf/
+.windsurf/*
+!.windsurf/*.md
+!.windsurf/rules/*.md
 target/
 node_modules/
