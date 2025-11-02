@@ -1,4 +1,4 @@
-name: 🏗️ Cross-Platform CORE API Build and Upload
+name: 🏗️ Cross-Platform CORE API + WebUI Build and Upload
 
 on:
   workflow_run:
@@ -38,7 +38,7 @@ jobs:
           override: true
           target: ${{ matrix.target }}
 
-      - name: 🧰 Install system dependencies (Linux only)
+      - name: 🧰 Install dependencies (Linux only)
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get update && sudo apt-get install -y pkg-config libssl-dev zip
 
@@ -46,7 +46,7 @@ jobs:
         working-directory: core
         run: cargo build --release --target ${{ matrix.target }}
 
-      - name: 📦 Package binary
+      - name: 📦 Package backend binary
         run: |
           mkdir -p artifacts
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
@@ -55,9 +55,41 @@ jobs:
             zip -j artifacts/${{ matrix.artifact }} core/target/${{ matrix.target }}/release/core-api*
           fi
 
-      - name: 🪶 Upload binary to GitHub release
+      - name: 🪶 Upload backend to GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG=$(git describe --tags --abbrev=0)
           gh release upload "$TAG" artifacts/${{ matrix.artifact }} --clobber
+
+  webui:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🧱 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 📦 Install dependencies
+        working-directory: webui
+        run: npm ci
+
+      - name: 🧩 Build SolidJS frontend
+        working-directory: webui
+        run: npm run build
+
+      - name: 📁 Package WebUI build
+        run: |
+          mkdir -p artifacts
+          zip -r artifacts/core-webui.zip webui/dist
+
+      - name: 🚀 Upload WebUI bundle to GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=$(git describe --tags --abbrev=0)
+          gh release upload "$TAG" artifacts/core-webui.zip --clobber
