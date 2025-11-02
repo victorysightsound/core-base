@@ -1,6 +1,6 @@
 {
   "name": "core-base",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "The foundation of the CORE platform (Rust API + SolidJS frontend).",
   "private": true,
   "scripts": {
