@@ -1,4 +1,4 @@
-name: 🏗️ Build and Upload Rust API Binary
+name: 🏗️ Cross-Platform CORE API Build and Upload
 
 on:
   workflow_run:
@@ -12,7 +12,20 @@ permissions:
 jobs:
   build:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact: core-api-linux.zip
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact: core-api-macos.zip
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact: core-api-windows.zip
 
     steps:
       - name: 🧱 Checkout repository
@@ -23,23 +36,28 @@ jobs:
         with:
           toolchain: stable
           override: true
+          target: ${{ matrix.target }}
 
-      - name: 🧰 Install dependencies
+      - name: 🧰 Install system dependencies (Linux only)
+        if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get update && sudo apt-get install -y pkg-config libssl-dev zip
 
       - name: 🦀 Build Rust backend (release mode)
         working-directory: core
-        run: cargo build --release
+        run: cargo build --release --target ${{ matrix.target }}
 
       - name: 📦 Package binary
-        working-directory: core
         run: |
-          mkdir -p ../artifacts
-          zip -j ../artifacts/core-api.zip target/release/core-api
+          mkdir -p artifacts
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            powershell Compress-Archive -Path core\\target\\${{ matrix.target }}\\release\\core-api.exe -DestinationPath artifacts\\${{ matrix.artifact }}
+          else
+            zip -j artifacts/${{ matrix.artifact }} core/target/${{ matrix.target }}/release/core-api*
+          fi
 
       - name: 🪶 Upload binary to GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG=$(git describe --tags --abbrev=0)
-          gh release upload "$TAG" artifacts/core-api.zip --clobber
+          gh release upload "$TAG" artifacts/${{ matrix.artifact }} --clobber
