@@ -1,0 +1,45 @@
+name: 🏗️ Build and Upload Rust API Binary
+
+on:
+  workflow_run:
+    workflows: ["🚀 CORE Auto Release"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🧱 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: 🧰 Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y pkg-config libssl-dev zip
+
+      - name: 🦀 Build Rust backend (release mode)
+        working-directory: core
+        run: cargo build --release
+
+      - name: 📦 Package binary
+        working-directory: core
+        run: |
+          mkdir -p ../artifacts
+          zip -j ../artifacts/core-api.zip target/release/core-api
+
+      - name: 🪶 Upload binary to GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=$(git describe --tags --abbrev=0)
+          gh release upload "$TAG" artifacts/core-api.zip --clobber
